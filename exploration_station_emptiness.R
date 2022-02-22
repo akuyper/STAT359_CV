@@ -1,8 +1,6 @@
 # load package(s)
 library(tidyverse)
 
-## basic rides numbers, inner comm, between comm, by community
-
 # load in data
 rides <- read_csv("data/processed/station_hist_community_measures.csv")
 View(rides)
@@ -30,6 +28,8 @@ rides <- rides %>%
     hour %in% 0:6 ~ "No",
     hour %in% 20:24 ~ "No"
   ))
+
+
 
 # gets you average_daily emptiness
 # View(rides %>% 

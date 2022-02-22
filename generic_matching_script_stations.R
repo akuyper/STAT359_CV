@@ -9,18 +9,11 @@ library(sf)
 #First, read in the data with the coordinates you want to match to geographical areas (bike data, traffic stops, etc...)
 point_data <- read_csv("data/divvy2013_sample.csv")
 point_data <- point_data %>% 
+  dplyr::select(-1) %>% 
   janitor::clean_names() 
 
 #Then read in the shape file that outlines your geographic units (neighborhoods, census tracts, etc...)
 geo_data <- read_sf("data/geo_export_279165a1-c897-4e25-b141-d5fc4a4996ec.shp")
-
-# View(point_data)
-# View(geo_data)
-
-#I tried to get the neighborhood part to change but it made things too complicated.  So if, for example,  you are working 
-#with census tracts, you should switch all instances of neighborhood to tract so it makes more sense. 
-
-#column_name should be the name of the column (string) in geo_data that contains the name of the geographical area you are using
 
 #assign_if_not_in should be a string that is using in the geographical area column if the point from point_data does
 #not fall into any of the geographical areas.  For example, if you are looking at bike stations and neighborhoods,
