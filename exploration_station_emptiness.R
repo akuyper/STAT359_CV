@@ -79,3 +79,4 @@ rides_2 <- rides_2 %>%
 rides_final <- merge(rides_1, rides_2, by=c("year","community", "num_stations_in_comm", "season", "peak_hour", "day"))
 
 write_csv(rides_final, "data/processed/ride_by_comm_season_pkhrs_avgdailyemptiness_bikeavail.csv")
+

@@ -73,3 +73,5 @@ write_csv(rides_s, "data/processed/ride_numbers_by_season_by_year_by_community.c
 
  write_csv(rides_comm, "data/processed/ride_numbers_by_community.csv")
  
+ 
+ 
