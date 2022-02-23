@@ -1,9 +1,10 @@
 # load package(s)
 library(tidyverse)
+library(arrow)
 
 # load in data
-rides <- read_csv("data/processed/station_hist_community_measures.csv")
-View(rides)
+rides <- read_csv_arrow("data/processed/station_hist_community_measures.csv")
+# View(rides)
 
 # get timestamps sorted out for seasons and peak hours
 rides <- rides %>% 
@@ -29,53 +30,59 @@ rides <- rides %>%
     hour %in% 20:24 ~ "No"
   ))
 
+daily_community_station <- rides %>% 
+  # if you only want peak hours
+  # filter(peak_hour == "Yes") %>% 
+  # date format for grouping: YYYY-MM-DD
+  mutate(
+    date = date(timestamp)     
+  ) %>% 
+  group_by(peak_hour, date, community, id) %>% 
+  # variables to average
+  dplyr::select(total_docks, docks_in_service, available_docks, available_bikes, percent_full) %>% 
+  # automatically keeps grouping vars
+  # calculating station daily averages
+  summarise(
+    # can do median by switching mean with median
+    across(where(is.numeric), mean)
+  ) %>% 
+  # automatically ungroups by last grouping var; follow up by removing it
+  dplyr::select(-id) %>%
+  # calculating community station daily averages
+  summarise(
+    num_stations = n(),
+    across(where(is.numeric), mean)
+  ) %>% 
+  ungroup()
+
+View(daily_community_station)
+
+seasonal_community_station <- rides %>% 
+  # if you only want peak hours
+  # filter(peak_hour == "Yes") %>% 
+  # if you just want year, can take season variable out from line below
+  group_by(peak_hour, year, season, community, id) %>% 
+  # variables to average
+  dplyr::select(total_docks, docks_in_service, available_docks, available_bikes, percent_full) %>% 
+  # automatically keeps grouping vars
+  # calculating station daily averages
+  summarise(
+    # can do median by switching mean with median
+    across(where(is.numeric), mean)
+  ) %>% 
+  # automatically ungroups by last grouping var; follow up by removing it
+  dplyr::select(-id) %>%
+  # calculating community station daily averages
+  summarise(
+    num_stations = n(),
+    across(where(is.numeric), mean)
+  ) %>% 
+  ungroup()
+
+View(seasonal_community_station)
 
 
-# gets you average_daily emptiness
-# View(rides %>% 
-#   mutate(emptiness = (100 - percent_full)) %>% 
-#   group_by(community, year, season, day, peak_hour) %>% 
-#   mutate(avg_daily_emptiness = mean(emptiness, na.rm=TRUE)) %>% 
-#   select(day, avg_daily_emptiness, emptiness))
-
-# putting it all together
-rides_1 <- rides %>% 
-  mutate(emptiness = (100 - percent_full)) %>% 
-  group_by(community, year, season, day, peak_hour) %>% 
-  mutate(avg_daily_emptiness = mean(emptiness, na.rm=TRUE)) 
-
-# how many stations in each community area
-rides_station_num <- rides_1 %>% 
-  group_by(year, community) %>% 
-  select(year, community, station_name) %>% 
-  unique() %>% 
-  count(community) %>%
-  mutate(num_stations_in_comm = n) %>% 
-  select(-n)
-
-# merging back with original dataset
-rides_1 <- merge(rides_1, rides_station_num, by=c("year","community"))
-
-rides_1 <- rides_1 %>% 
-  group_by(community, year, season, peak_hour, day) %>% 
-  select(community, year, num_stations_in_comm, season, peak_hour, day, avg_daily_emptiness) %>% 
-  unique()
-
-write_csv(rides_1, "data/processed/ride_by_comm_season_pkhrs_avgdailyemptiness.csv")
-
-# adding in bike availability
-rides_2 <- rides %>% 
-  group_by(community, year, season, day, peak_hour) %>% 
-  mutate(avg_daily_bike_avail = mean(available_bikes, na.rm=TRUE)) 
-
-rides_2 <- merge(rides_2, rides_station_num, by=c("year","community"))
-
-rides_2 <- rides_2 %>% 
-  group_by(community, year, season, peak_hour, day) %>% 
-  select(community, year, num_stations_in_comm, season, peak_hour, day, avg_daily_bike_avail) %>% 
-  unique()
-
-# merge both files to get final summary document
-rides_final <- merge(rides_1, rides_2, by=c("year","community", "num_stations_in_comm", "season", "peak_hour", "day"))
-
-write_csv(rides_final, "data/processed/ride_by_comm_season_pkhrs_avgdailyemptiness_bikeavail.csv")
+# # merge both files to get final summary document
+# rides_final <- merge(rides_1, rides_2, by=c("year","community", "num_stations_in_comm", "season", "peak_hour", "day"))
+# 
+# write_csv(rides_final, "data/processed/ride_by_comm_season_pkhrs_avgdailyemptiness_bikeavail.csv")
