@@ -6,7 +6,7 @@ Olivier Gabison, Mimi Wang, Austin Kim, Akshya Dhinakaran, Sam Dailley
 
 ## Introduction
 
-The goal of our project is to compile, clean, and analyze divvy bike data in Chicago, USA. Our responsibility was to determine which control variables we need to include in the datasheets we will be analzying and sending out to other groups to use. We have written R scripts to run on the divvy bike historical datasets in order to create datasheets that can be used for further analysis later.
+The goal of our project is to compile, clean, and analyze divvy bike data in Chicago, USA. Our responsibility was to determine which control variables we need to include in the datasheets that we are analzying and then sending it out for other groups to use. We have written R scripts to run on the divvy bike historical datasets in order to create datasheets that can be used for further analysis later.
 
 ## Directions
 
@@ -14,7 +14,7 @@ You can follow along these steps to build off or use our scripts in the future:
 
 1. `git clone git@github.com:austinkim118/STAT359_CV.git`
 1. After cloning the Github repo, move all the datasets being used into the cloned folder
-1. Modify the R scripts so it outputs datasheets to youor desired location (and modify any file names as needed)
+1. Modify the R scripts so it outputs datasheets to your desired location (and modify any file names as needed)
 1. Run your script!
 
 ## Size of dataset issues
