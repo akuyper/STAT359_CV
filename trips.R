@@ -1,4 +1,9 @@
 
+# Purpose -----------------------------------------------------------------
+
+# Processing code for Divvy historical trip data to analyze the number of 
+# trips starting and ending in each Chicago community on a yearly basis.
+
 # Set Up Packages and Data ------------------------------------------------
 
 # load packages
