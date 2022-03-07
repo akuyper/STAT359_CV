@@ -168,6 +168,7 @@ final_month <- left_join(
   from_to_month,
   pct_month,
   by = c("station_name", "month", "from", "to", "year")
+)
 
 
 
