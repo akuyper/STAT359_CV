@@ -56,10 +56,11 @@ divvy_data1 %>%
   ggplot() +
   geom_sf(mapping = aes(geometry = geometry, fill = percent_full)) +
   theme_void() +
-  scale_fill_viridis(trans = 'reverse') 
+  scale_fill_viridis(trans = 'reverse', name = "Dock Fullness Percentage") +
+  labs(title = "2021 Summer Average Community Dock Fullness", subtitle = "Peak Hours Only (7am-7pm)") 
 
 # table with Chicago communities ranked on percent_full from highest to lowest in 2021 summer peak hours
-divvy_data1 %>% 
+t1 <- divvy_data1 %>% 
   arrange(desc(percent_full)) %>% 
   select(community, num_stations, percent_full, docks_in_service)
 
@@ -68,9 +69,10 @@ divvy_data1 %>%
   ggplot() +
   geom_sf(mapping = aes(geometry = geometry, fill = available_bikes)) +
   theme_void() +
-  scale_fill_viridis(trans = 'reverse') 
+  scale_fill_viridis(trans = 'reverse', name = "Average Bike Availability") +
+  labs(title = "2021 Summer Average Community Bike Availability", subtitle = "Peak Hours Only (7am-7pm)")
 
 # table with Chicago communities ranked on bike availability from highest to lowest in 2021 summer peak hours
-divvy_data1 %>% 
+t2 <- divvy_data1 %>% 
   arrange(desc(available_bikes)) %>% 
   select(community, num_stations, available_bikes, docks_in_service)

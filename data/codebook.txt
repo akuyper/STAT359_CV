@@ -1,0 +1,94 @@
+divvy_allyrs_daily.csv
+
+Description:
+A dataset containing Divvy 2013-2021 historical bike station data that is organized by date, peak hour categorization, and community area. It includes the number of stations in each corresponding community, and daily community averages for station metrics of total docks, docks in service, available docks, available bikes, and percent full in the whole community area. 
+
+Usage:
+‘divvy_allyrs_daily.csv’ is stored under the variable ‘divvy_allyrs_daily’ in the R script titled ‘divvy_community_station_stats.R’ where I include all the steps taken to get to this compiled dataset.
+
+Format:
+A data frame with 241,978 observations and 9 variables
+
+The variables are as follows:
+peak_hour: Whether the station data was measured during peak hours or not (Yes, No). Peak hours are defined as from 7am to 7pm.
+date: The date (formatted YYYY-MM-DD) the daily average is calculated for. 
+community: The Chicago community area.
+num_stations: The number of stations in total in the community.
+total_docks: Mean total docks for all stations in the community. Each dock can accommodate one bicycle.
+docks_in_service: Mean docks in service for all stations in the community. Excludes docks taken out of service. Calculated as the number of docks reported as containing available bicycles or available to receive returned bicycles.
+available_docks: Mean number of docks available to receive a returned bicycle for all stations in the community.
+available_bikes: Mean number of bicycles available to be rented for all stations in the community.
+percent_full: Mean percentage of the docks in service containing an available bike for all stations in the community.
+
+
+divvy_allyrs_seasonal.csv
+
+Description:
+A dataset containing Divvy 2013-2021 historical bike station data that is organized by year, season, peak hour categorization, and community area. It includes the number of stations in each corresponding community, and seasonal community averages for station metrics of total docks, docks in service, available docks, available bikes, and percent full. 
+
+Usage:
+‘divvy_allyrs_seasonal.csv’ is stored under the variable ‘divvy_allyrs_seasonal’ in my R script titled ‘divvy_community_station_stats.R’ where I include all the steps taken to get to this compiled dataset.
+
+Format:
+A data frame with 3,312 observations and 10 variables
+
+The variables are as follows:
+peak_hour: Whether the station data was measured during peak hours or not (Yes, No). Peak hours are defined as from 7am to 7pm.
+year: The year the seasonal average is calculated for. 
+season: The season the seasonal average is calculated for each year.
+community: The Chicago community area.
+num_stations: The number of stations in total in the community.
+total_docks: Mean total docks for all stations in the community. Each dock can accommodate one bicycle.
+docks_in_service: Mean docks in service for all stations in the community. Excludes docks taken out of service. Calculated as the number of docks reported as containing available bicycles or available to receive returned bicycles.
+available_docks: Mean number of docks available to receive a returned bicycle for all stations in the community.
+available_bikes: Mean number of bicycles available to be rented for all stations in the community.
+percent_full: Mean percentage of the docks in service containing an available bike for all stations in the community.
+trips.csv
+
+Description:
+A dataset containing Divvy 2013-2020 historical bike rides data that is organized by year. It includes the number of rides that started and ended in each divvy station.
+
+Format:
+A data frame with 3747 observations and 9 variables
+
+The variables are as follows:
+year: the year the data was collected from
+station_name: name of divvy stations
+from: number of divvy rides that departed from the station in a specified year
+to: number of divvy rides that departed from the station ina specified year
+pct_from: percentage of rides that departed from each stations out of the total number of rides that occurred in a specified year
+pct_to: percentage of rides that arrived to each stations out of the total number of rides that occurred in a specified year
+pct_return: percentage of rides that returned to the station (pct_to / pct_from)
+community_area: name of the community area that the stations are located
+install_year: the year stations were built
+
+Stations_density_2021.csv
+Description
+A dataset containing stations directly from CDOT (chicago department of transportation) with the corresponding latitude (lat), longitude (long), community area, and the number of stations within a 2 mile radius. This is going off of the dataset our mentor Amanda gave us, so the stations list is the most recently updated list available (year 2021).
+
+Usage
+Stations_density_2021.csv is stored under the dataframe stations_density_2021 in my R script.
+
+Format
+A data frame with 840 rows and 5 columns
+
+Variables
+station_name: the name of the station
+in_2_mi_radius: the amount of stations within a 2 mile radius. For example, 40 means that there are 40 divvy stations located within a 2 mile radius of the corresponding station.
+lat: latitude of the station location
+lon: longitude of the station location
+community_area: community area the station is located in
+
+comm_density_2021.csv
+Description
+A dataset containing community areas, and the average number of stations within a 2 mile radius for each community area. This is going off of the dataset our mentor Amanda gave us, so the stations list is the most recently updated list available (year 2021).
+
+Usage
+comm_density_2021.csv is stored under the dataframe comm_density_2021 in my R script.
+
+Format
+A data frame with 70 rows and 2 columns
+
+Variables
+community_area: community area within Chicago
+avg_in_2_mi_radius: the average amount of stations within a 2 mile radius, rounded to the hundredths. For example, 60.33 means that there are, on average, 60.33 stations within a 2 mile radius for the stations within the corresponding community area.
