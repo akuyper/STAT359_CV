@@ -1,9 +1,4 @@
 
-# Purpose -----------------------------------------------------------------
-
-# Processing code for Divvy historical trip data to analyze the number of 
-# trips starting and ending in each Chicago community on a yearly basis.
-
 # Set Up Packages and Data ------------------------------------------------
 
 # load packages
@@ -30,46 +25,57 @@ library(sf)
 
 # if there are further issues with sf package, refer to https://kb.northwestern.edu/troubleshooting-installing-r-packages#SF
 
-## Coordinate points into stations/
-# read in data with lat-long coordinates you want matched to community area (station stats)
+## load data
 trip_data <- read_csv_arrow("/projects/e30686/data/raw/trip_data.csv")
-stations_communites <- read_csv_arrow("/projects/e30686/data/Full Network Station Install Dates.csv")
+station_community <- read_csv_arrow("/projects/e30686/data/Full Network Station Install Dates.csv")
 
-# yearly data 
-from_year <- trip_data %>% 
+## This dataset includes stations and their respective community area names
+stations_communites <- station_community %>% 
+  select(name, community_area, `install date`) %>% 
+  mutate(
+    install_date = as.Date(`install date`, "%m/%d/%Y"),
+    install_year = year(install_date)
+  ) %>%
+  select(-c((`install date`), install_date))
+
+# rides organized by year and stations where the rides departed
+from_station <- trip_data %>% 
   mutate(
     year = year(start_time)
   ) %>% 
   count(year, from_station_name)
 
-stations_communites <- stations_communites %>% 
-  select(name, community_area, `install date`)
+# rides organized by year and community areas where the rides departed
+from_community <- merge(from_station, stations_communites, by.x = "from_station_name", by.y = "name")
 
-from_community <- merge(from_year, stations_communites, by.x = "from_station_name", by.y = "name")
-
-to_year <- trip_data %>% 
+# rides organized by year and stations where the rides arrived
+to_station <- trip_data %>% 
   mutate(
     year = year(stop_time)
   ) %>% 
   count(year, to_station_name)
 
-to_community <- merge(to_year, stations_communites, by.x = "to_station_name", by.y = "name")
+# rides organized by year and community areas where the rides arrived
+to_community <- merge(to_station, stations_communites, by.x = "to_station_name", by.y = "name")
 
-pct_from_year <- from_year %>% 
+# percentage of rides from any stations out of the total rides that occured in each year
+pct_from_station <- from_station %>% 
   group_by(year) %>% 
   mutate(
     pct_rides = 100 * n / sum(n)
   ) 
 
-pct_to_year <- to_year %>% 
+# percentage of rides to any stations out of the total rides that occured in each year
+pct_to_station <- to_station %>% 
   group_by(year) %>% 
   mutate(
     pct_rides = 100 * n / sum(n)
   )
 
+## joined the above two percentages tables --> shows unique station names and percentages of rides that departed and arrived to it
 pct_year <- left_join(
-  pct_from_year, 
-  pct_to_year, 
+  pct_from_station, 
+  pct_to_station, 
   by = c("from_station_name" = "to_station_name", "year" = "year")
 ) %>% 
   rename(
@@ -80,10 +86,10 @@ pct_year <- left_join(
     pct_to = pct_rides.y
   )
 
-## final dataset
-from_to_year <- left_join(
-  from_year, 
-  to_year, 
+## yearly_rides ----
+yearly_rides <- left_join(
+  from_station, 
+  to_station,
   by = c("from_station_name" = "to_station_name", "year" = "year")
 ) %>% 
   rename(
@@ -95,85 +101,31 @@ from_to_year <- left_join(
     pct_return = 100 * to / from
   ) 
 
-final_year <- left_join(
-  from_to_year,
+yearly_rides <- left_join(
+  yearly_rides,
   pct_year,
   by = c("station_name", "year", "from", "to")
 )
 
-## use ----
+yearly_rides <- left_join(
+  yearly_rides,
+  stations_communites,
+  by = c("station_name" = "name")
+) %>% 
+  select(year, station_name, from, to, pct_from, pct_to, pct_return, community_area, install_year)
 
-data_2019 <- from_to_year %>% 
-  filter(year == 2019)
+write.csv(yearly_rides, 'my_data/yearly_rides.csv')
 
-data_2019_accesibility <- data_2019 %>% 
+## accessibility example ----
+
+accessibility_2019 <- yearly_rides %>% 
+  filter(year == 2019) %>% 
   filter(pct_return < 90) %>% 
-  arrange(desc(pct_return))
+  arrange(desc(pct_return)) %>% 
+  select(year, station_name, community_area, pct_return) 
 
-# monthly data ----
-from_month <- trip_data %>% 
-  mutate(
-    year = year(start_time),
-    month = month(start_time)
-  ) %>% 
-  count(year, month, from_station_name)
 
-from_community <- merge(from_month, stations_communites, by.x = "from_station_name", by.y = "name")
 
-to_month <- trip_data %>% 
-  mutate(
-    year = year(stop_time),
-    month = month(stop_time)
-  ) %>% 
-  count(year, month, to_station_name)
-
-to_community <- merge(to_month, stations_communites, by.x = "to_station_name", by.y = "name")
-
-## percentages 
-pct_from_month <- from_month %>% 
-  group_by(year, month) %>% 
-  mutate(
-    pct_rides = 100 * n / sum(n)
-  ) 
-
-pct_to_month <- to_month %>% 
-  group_by(year, month) %>% 
-  mutate(
-    pct_rides = 100 * n / sum(n)
-  )
-
-pct_month <- left_join(
-  pct_from_month, 
-  pct_to_month, 
-  by = c("from_station_name" = "to_station_name", "month" = "month", "year" = "year")
-) %>% 
-  rename(
-    station_name = from_station_name,
-    from = n.x,
-    pct_from = pct_rides.x,
-    to = n.y,
-    pct_to = pct_rides.y
-  )
-
-from_to_month <- left_join(
-  from_month, 
-  to_month, 
-  by = c("from_station_name" = "to_station_name", "month" = "month", "year" = "year")
-) %>% 
-  rename(
-    station_name = from_station_name,
-    from = n.x,
-    to = n.y
-  ) %>% 
-  mutate(
-    pct_return = 100 * to / from
-  ) 
-
-final_month <- left_join(
-  from_to_month,
-  pct_month,
-  by = c("station_name", "month", "from", "to", "year")
-)
 
 
 
